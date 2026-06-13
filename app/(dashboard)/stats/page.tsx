@@ -5,8 +5,8 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import StatsTable, { type StatsRow } from "@/components/StatsTable";
 import GoalsPieChart, { type GoalsPieDatum } from "@/components/charts/GoalsPieChart";
 import FormationsChart, { type FormationsChartDatum } from "@/components/charts/FormationsChart";
-import { playerName } from "@/lib/format";
-import type { Formation, Player, PlayerStats } from "@/lib/types";
+import { ROLE_CHART_COLORS, ROLE_LABELS, RUOLO_ORDER } from "@/lib/roles";
+import type { Formation, Player, PlayerStats, Ruolo } from "@/lib/types";
 
 export default async function StatsPage({
   searchParams,
@@ -44,10 +44,20 @@ export default async function StatsPage({
     stats: statsByPlayer.get(p.id) ?? null,
   }));
 
-  const pieData: GoalsPieDatum[] = rows
-    .filter((r) => (r.stats?.gol ?? 0) > 0)
-    .sort((a, b) => (b.stats?.gol ?? 0) - (a.stats?.gol ?? 0))
-    .map((r) => ({ name: playerName(r.player), value: r.stats?.gol ?? 0 }));
+  const goalsByRole = new Map<Ruolo, number>();
+  for (const row of rows) {
+    if (!row.player.ruolo) continue;
+    const current = goalsByRole.get(row.player.ruolo) ?? 0;
+    goalsByRole.set(row.player.ruolo, current + (row.stats?.gol ?? 0));
+  }
+
+  const pieData: GoalsPieDatum[] = RUOLO_ORDER.filter((ruolo) => (goalsByRole.get(ruolo) ?? 0) > 0).map(
+    (ruolo) => ({
+      name: ROLE_LABELS[ruolo],
+      value: goalsByRole.get(ruolo) ?? 0,
+      color: ROLE_CHART_COLORS[ruolo],
+    })
+  );
 
   const formationsChartData: FormationsChartDatum[] = formationRows.map((f) => ({
     modulo: f.modulo,
@@ -66,7 +76,7 @@ export default async function StatsPage({
       </Card>
 
       <Card className="mb-6">
-        <CardTitle>Distribuzione gol</CardTitle>
+        <CardTitle>Distribuzione gol per ruolo</CardTitle>
         {pieData.length > 0 ? (
           <GoalsPieChart data={pieData} />
         ) : (

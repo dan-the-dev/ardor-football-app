@@ -3,12 +3,20 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_PATHS = ["/login"];
 
+function getAuthCookiePrefix(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) throw new Error("NEXT_PUBLIC_SUPABASE_URL is not set");
+  const projectRef = new URL(url).hostname.split(".")[0];
+  return `sb-${projectRef}-auth-token`;
+}
+
 /**
  * Aggiorna la sessione Supabase (refresh token) e applica il redirect
  * di autenticazione per tutte le route tranne /login.
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
+  const authCookiePrefix = getAuthCookiePrefix();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,7 +24,11 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll();
+          return request.cookies
+            .getAll()
+            .filter(
+              (c) => c.name === authCookiePrefix || c.name.startsWith(`${authCookiePrefix}.`)
+            );
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>

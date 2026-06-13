@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import { resolveSeason } from "@/lib/season";
+import { getSeasonMetadata, resolveSeason } from "@/lib/season";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardTitle, StatCard } from "@/components/ui/Card";
 import GoalsBarChart, { type GoalsBarChartDatum } from "@/components/charts/GoalsBarChart";
 import { formatDateLong, formatDateShort, playerName } from "@/lib/format";
-import type { Match, PlayerStats, Season } from "@/lib/types";
+import type { Match, PlayerStats } from "@/lib/types";
 
 interface PlayerStatsRow extends PlayerStats {
   players: { nome: string; cognome: string } | null;
@@ -34,9 +34,9 @@ export default async function DashboardPage({
     );
   }
 
-  const [{ data: season }, { data: playedMatches }, { data: scheduledMatches }, { data: topScorers }, { data: topAssists }] =
+  const [season, { data: playedMatches }, { data: scheduledMatches }, { data: topScorers }, { data: topAssists }] =
     await Promise.all([
-      supabase.from("seasons").select("*").eq("code", seasonCode).maybeSingle(),
+      getSeasonMetadata(seasonCode, supabase),
       supabase
         .from("matches")
         .select("*")
@@ -88,11 +88,11 @@ export default async function DashboardPage({
     <div>
       <PageHeader
         title="Dashboard"
-        description={(season as Season | null)?.name ?? seasonCode}
+        description={season?.name ?? seasonCode}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Piazzamento" value={(season as Season | null)?.piazzamento ?? "—"} />
+        <StatCard label="Piazzamento" value={season?.piazzamento ?? "—"} />
         <StatCard label="Partite giocate" value={matches.length} />
         <StatCard label="V / N / P" value={`${vittorie} / ${pareggi} / ${sconfitte}`} />
         <StatCard

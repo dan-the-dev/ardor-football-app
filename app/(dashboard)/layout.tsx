@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getAccessibleSeasons } from "@/lib/season";
 import Sidebar from "@/components/Sidebar";
-import type { Season } from "@/lib/types";
 
 export default async function DashboardLayout({
   children,
@@ -18,14 +18,11 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const { data: seasons } = await supabase
-    .from("seasons")
-    .select("*")
-    .order("code", { ascending: false });
+  const seasons = await getAccessibleSeasons(supabase);
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar seasons={(seasons ?? []) as Season[]} userEmail={user.email ?? ""} />
+      <Sidebar seasons={seasons} userEmail={user.email ?? ""} />
       <main className="ml-64 flex-1 p-6 md:p-8">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
