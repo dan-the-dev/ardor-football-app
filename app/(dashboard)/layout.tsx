@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAccessibleSeasons } from "@/lib/season";
-import Sidebar from "@/components/Sidebar";
+import { hasGlobalTacticsAccess } from "@/lib/tactics-access";
+import DashboardShell from "@/components/DashboardShell";
 
 export default async function DashboardLayout({
   children,
@@ -18,14 +19,18 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  const seasons = await getAccessibleSeasons(supabase);
+  const [seasons, hasTacticsAccess] = await Promise.all([
+    getAccessibleSeasons(supabase),
+    hasGlobalTacticsAccess(supabase),
+  ]);
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar seasons={seasons} userEmail={user.email ?? ""} />
-      <main className="ml-64 flex-1 p-6 md:p-8">
-        <div className="mx-auto max-w-6xl">{children}</div>
-      </main>
-    </div>
+    <DashboardShell
+      seasons={seasons}
+      userEmail={user.email ?? ""}
+      hasTacticsAccess={hasTacticsAccess}
+    >
+      {children}
+    </DashboardShell>
   );
 }

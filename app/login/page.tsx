@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Goal } from "lucide-react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -38,9 +38,14 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-ardor-black px-4">
       <div className="w-full max-w-sm rounded-2xl border border-ardor-gray bg-ardor-black-soft p-8 shadow-xl">
         <div className="mb-8 flex flex-col items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-ardor-orange/10 text-ardor-orange">
-            <Goal size={28} />
-          </span>
+          <Image
+            src="/logo.png"
+            alt="Ardor"
+            width={64}
+            height={64}
+            className="object-contain"
+            priority
+          />
           <h1 className="text-xl font-semibold tracking-tight">
             Ardor <span className="text-ardor-orange">Football Hub</span>
           </h1>

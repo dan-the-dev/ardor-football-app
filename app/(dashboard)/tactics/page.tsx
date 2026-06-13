@@ -1,13 +1,13 @@
 import { Lock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { hasGlobalTacticsAccess } from "@/lib/tactics-access";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardTitle } from "@/components/ui/Card";
 import type { FormationsByCategory } from "@/lib/types";
 
 export default async function TacticsPage() {
   const supabase = await createClient();
-  const { data: userData } = await supabase.auth.getUser();
-  const hasAccess = userData.user?.app_metadata?.global_tactics_access === true;
+  const hasAccess = await hasGlobalTacticsAccess(supabase);
 
   if (!hasAccess) {
     return (

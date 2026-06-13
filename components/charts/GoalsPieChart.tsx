@@ -12,7 +12,7 @@ const FALLBACK_COLORS = ["#e87425", "#f5a05c", "#c45f1a", "#6b7280", "#3d3d3d", 
 
 export default function GoalsPieChart({ data }: { data: GoalsPieDatum[] }) {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={280}>
       <PieChart>
         <Pie data={data} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} paddingAngle={2}>
           {data.map((entry, i) => (

@@ -22,7 +22,15 @@ export default function GoalsBarChart({ data }: { data: GoalsBarChartDatum[] }) 
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" vertical={false} />
-        <XAxis dataKey="label" stroke="#6b7280" fontSize={11} interval="preserveStartEnd" />
+        <XAxis
+          dataKey="label"
+          stroke="#6b7280"
+          fontSize={10}
+          interval="preserveStartEnd"
+          angle={-35}
+          textAnchor="end"
+          height={56}
+        />
         <YAxis stroke="#6b7280" fontSize={11} allowDecimals={false} />
         <Tooltip
           contentStyle={{
