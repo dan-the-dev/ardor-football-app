@@ -17,3 +17,9 @@ export function playerName(p: { nome: string; cognome: string } | null | undefin
   if (!p) return "—";
   return `${p.nome} ${p.cognome}`;
 }
+
+export function truncateText(text: string | null | undefined, maxLength = 100): string | null {
+  if (!text) return null;
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength).trimEnd()}…`;
+}

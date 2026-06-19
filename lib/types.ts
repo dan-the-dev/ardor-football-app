@@ -191,6 +191,7 @@ export interface Exercise {
   nome: string;
   categoria: ExerciseCategoria;
   descrizione: string | null;
+  video_url: string | null;
   score_medio: number | null;
   volte_usato: number;
   stagioni_usato: string[];
